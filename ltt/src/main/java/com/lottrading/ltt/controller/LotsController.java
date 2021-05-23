@@ -1,79 +1,70 @@
 package com.lottrading.ltt.controller;
 
+import com.lottrading.ltt.dto.LotDto;
 import com.lottrading.ltt.exception.MyIOException;
 import com.lottrading.ltt.exception.NotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("lots")
 public class LotsController {
 
-//    @Autowired
-//    private LotRepository lotRepository;
-
-    private int counter = 3;
-    private List<Map<String, String>> bids = new ArrayList<>();
-    private List<Map<String, String>> lots = new ArrayList<>(){{
-        add(new HashMap<String, String>(){{ put("id", "1"); put("title", "Car"); put("buyout", "1000"); put("minBid", "500"); put("maxBid", "0"); }});
-        add(new HashMap<String, String>(){{ put("id", "2"); put("title", "Toy"); put("buyout", "500"); put("minbid", "100"); put("maxBid", "0"); }});
-    }};
+    private long counter = 1;
+    private List<LotDto> lots = new ArrayList<>();
 
     @GetMapping
-    public List<Map<String, String>> list(){
+    public List<LotDto> list(){
         return lots;
     }
 
     @GetMapping("{id}")
-    public Map<String, String> getOne(@PathVariable String id){
+    public LotDto getOne(@PathVariable String id){
         return getLot(id);
     }
 
-    public Map<String, String> getLot(@PathVariable String id){
+    public LotDto getLot(@PathVariable String id){
         return lots.stream()
-                .filter(lot -> lot.get("id").equals(id))
+                .filter(lot -> Long.toString(lot.getId()).equals(id))
                 .findFirst()
                 .orElseThrow(NotFoundException::new);
     }
 
     @PostMapping
-    public Map<String, String> create(//@RequestBody Map<String, String> lot
-                                      @RequestParam String title,
-                                      @RequestParam int buyoutPrice,
-                                      @RequestParam int minBidPrice) {
-        Map<String, String> lot = new HashMap<>(){{
-            put("title", title);
-            put("buyout", String.valueOf(buyoutPrice));
-            put("minBid", String.valueOf(minBidPrice));
-            put("id", String.valueOf(counter++));
-            put("maxBid", "0");
+    public LotDto create(@RequestParam String title,
+                         @RequestParam int buyout,
+                         @RequestParam int minBid) {
+        LotDto lotDto = new LotDto(){{
+            setId(counter++);
+            setTitle(title);
+            setBuyoutPrice(buyout);
+            setMinBidPrice(minBid);
+            setBidPrices(new ArrayList<>(){{ add(0); }});
         }};
-//        lot.put("id", String.valueOf(counter++));
-
-        lots.add(lot);
-        return lot;
+        lots.add(lotDto);
+        return lotDto;
     }
 
     @PutMapping("{id}")
-    public Map<String, String> update(@PathVariable String id,
-                                      // @RequestBody Map<String, String> lot
-                                      @RequestParam int maxBidPrice) {
-        Map<String, String> lotFromDb = getLot(id);
-//        lotFromDb.putAll(lot);
-//        lotFromDb.put("id", id);
-        if(Integer.parseInt(lotFromDb.get("maxBid")) <= maxBidPrice && Integer.parseInt(lotFromDb.get("minBid")) <= maxBidPrice)
-            lotFromDb.put("maxBid", String.valueOf(maxBidPrice));
+    public LotDto update(@PathVariable String id,
+                         @RequestParam int yourBid) {
+        LotDto lotFromDb = getLot(id);
+        List<Integer> bids = lotFromDb.getBidPrices();
+        Integer lastBid = bids.get(bids.size()-1);
+        if(lastBid <= yourBid && lotFromDb.getMinBidPrice() <= yourBid) {
+            if(lastBid == 0) bids.remove(0);
+            bids.add(yourBid);
+            lotFromDb.setBidPrices(bids);
+        }
         else throw new MyIOException();
         return lotFromDb;
     }
 
     @DeleteMapping("{id}")
     public void delete(@PathVariable String id) {
-        Map<String, String> lot = getLot(id);
+        LotDto lot = getLot(id);
         lots.remove(lot);
     }
 }
