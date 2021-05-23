@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Добавление лота</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <header>
+        <div class="d-flex justify-content-center py-3">
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a href="/" class="nav-link" mb-checked="1" data-tip="">Все лоты</a></li>
+                <li class="nav-item"><a href="/lots" class="nav-link active" aria-current="page" mb-checked="1" data-tip="">Создать лот</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="container mt-5 mb-5">
+        <h1>Добавление лота</h1>
+        <form action="/lots" method="post">
+            <input type="text" name="title" placeholder="Введите название" class="form-control mt-2">
+            <input type="text" name="buyoutPrice" placeholder="Введите цену выкупа" class="form-control mt-2">
+            <input type="text" name="minBidPrice" placeholder="Введите цену начала торгов" class="form-control mt-2"><br>
+            <button type="submit" class="btn btn-success mt-2">Выставить лот</button>
+        </form>
+    </div>
+
+    <footer th:insert="blocks/footer :: footer"/>
+</body>
+</html>
