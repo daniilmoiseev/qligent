@@ -9,6 +9,7 @@ import java.util.Map;
 public class UserDto {
     private long id;
     private List<Map<String, String>> lotBids;
+    private List<Map<String, String>> buyLots;
 
     public UserDto(){}
 }

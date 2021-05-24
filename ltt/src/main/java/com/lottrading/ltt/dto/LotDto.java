@@ -11,6 +11,7 @@ public class LotDto {
     private String title;
     private int buyoutPrice;
     private int minBidPrice;
+    private int buyoutTime;
     private List<Map<String, String>> bidPrices;
 
     public LotDto(){}
