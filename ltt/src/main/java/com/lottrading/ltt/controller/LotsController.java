@@ -17,6 +17,7 @@ public class LotsController {
 
     private long counterLot = 1;
     private long counterUser = 1;
+    private int time = 30;
     private List<LotDto> lots = new ArrayList<>();
     private List<UserDto> users = new ArrayList<>();
 
@@ -53,6 +54,7 @@ public class LotsController {
             setTitle(title);
             setBuyoutPrice(buyout);
             setMinBidPrice(minBid);
+            setBuyoutTime(time);
             setBidPrices(new ArrayList<>(){{
                 add(new HashMap<>(){{
                     put("userId", "none");
@@ -96,8 +98,19 @@ public class LotsController {
     }
 
     @DeleteMapping("lots/{id}")
-    public void deleteLot(@PathVariable String id) {
+    public void deleteLot(@PathVariable String id,
+                          @RequestParam String userId) {
         LotDto lot = getLot(id);
+        UserDto user = getUser(userId);
+        List<Map<String, String>> userBuyLots = user.getBuyLots();
+        if(userBuyLots.get(0).get("lotId").equals("none")) {
+            userBuyLots.remove(0);
+        }
+        userBuyLots.add(new HashMap<>(){{
+            put("lotId", id);
+            put("buyout", Integer.toString(lot.getBuyoutPrice()));
+        }});
+        user.setBuyLots(userBuyLots);
         lots.remove(lot);
     }
 
@@ -121,13 +134,14 @@ public class LotsController {
                     put("bid", "0");
                 }});
             }});
+            setBuyLots(new ArrayList<>(){{
+                add(new HashMap<>(){{
+                    put("lotId", "none");
+                    put("buyout", "0");
+                }});
+            }});
         }};
         users.add(userDto);
         return userDto;
     }
 }
-
-/*
-@RequestBody Map<String, String> lot
-@RequestParam String title, @RequestParam int buyoutPrice, @RequestParam int minBidPrice
- */
