@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping
@@ -24,11 +25,9 @@ public class LotsController {
 
     @GetMapping("lots")
     public List<LotDto> list(){
-        ArrayList<LotDto> lll = new ArrayList<>();
-        lots.forEach(lot -> {
-            if(!lot.isArchive()) lll.add(lot);
-        });
-        return lll;
+        return lots.stream()
+                .filter(lot -> !lot.isArchive())
+                .collect(Collectors.toList());
     }
 
     @GetMapping("lots/{id}")
