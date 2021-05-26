@@ -4,12 +4,13 @@ import com.lottrading.ltt.dto.LotDto;
 import com.lottrading.ltt.dto.UserDto;
 import com.lottrading.ltt.exception.MyIOException;
 import com.lottrading.ltt.exception.NotFoundException;
+import com.lottrading.ltt.models.LotBid;
+import com.lottrading.ltt.models.UserBid;
+import com.lottrading.ltt.models.UserBuyout;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping
@@ -23,95 +24,107 @@ public class LotsController {
 
     @GetMapping("lots")
     public List<LotDto> list(){
-        return lots;
+        ArrayList<LotDto> lll = new ArrayList<>();
+        lots.forEach(lot -> {
+            if(!lot.isArchive()) lll.add(lot);
+        });
+        return lll;
     }
 
     @GetMapping("lots/{id}")
-    public LotDto getOneLot(@PathVariable String id){
+    public LotDto getOneLot(@PathVariable Long id){
         return getLot(id);
     }
 
-    public LotDto getLot(@PathVariable String id){
+    public LotDto getLot(@PathVariable Long id){
         return lots.stream()
-                .filter(lot -> Long.toString(lot.getId()).equals(id))
+                .filter(lot -> lot.getId() == id)
                 .findFirst()
                 .orElseThrow(NotFoundException::new);
     }
 
-    public UserDto getUser(@PathVariable String id){
+    public UserDto getUser(@PathVariable Long id){
         return users.stream()
-                .filter(user -> Long.toString(user.getId()).equals(id))
+                .filter(user -> user.getId() == id)
                 .findFirst()
                 .orElseThrow(NotFoundException::new);
     }
 
     @PostMapping("lots")
     public LotDto createLot(@RequestParam String title,
-                         @RequestParam int buyout,
-                         @RequestParam int minBid) {
+                            @RequestParam int buyout,
+                            @RequestParam int minBid) {
         LotDto lotDto = new LotDto(){{
             setId(counterLot++);
             setTitle(title);
-            setBuyoutPrice(buyout);
-            setMinBidPrice(minBid);
+            setBuyout(buyout);
+            setMinBid(minBid);
             setBuyoutTime(time);
-            setBidPrices(new ArrayList<>(){{
-                add(new HashMap<>(){{
-                    put("userId", "none");
-                    put("bid", "0");
-                }});
-            }});
+            setArchive(false);
+            setLotBids(new ArrayList<>());
         }};
         lots.add(lotDto);
         return lotDto;
     }
 
     @PutMapping("lots")
-    public LotDto updateLot(@RequestParam String id,
-                            @RequestParam String userId,
+    public LotDto updateLot(@RequestParam Long id,
+                            @RequestParam Long userId,
                             @RequestParam int yourBid) {
         LotDto lotFromDb = getLot(id);
-        List<Map<String, String>> bids = lotFromDb.getBidPrices();
-        Map<String, String> lastBids = bids.get(bids.size()-1);
+        List<LotBid> bids = lotFromDb.getLotBids();
 
         UserDto userFromDb = getUser(userId);
-        List<Map<String, String>> userBids = userFromDb.getLotBids();
-        Map<String, String> userLastBids = userBids.get(userBids.size()-1);
+        List<UserBid> userBids = userFromDb.getUserBids();
 
-        if(Integer.parseInt(lastBids.get("bid")) <= yourBid && lotFromDb.getMinBidPrice() <= yourBid && !lastBids.get("userId").equals(userId)) {
-            if(lastBids.get("userId").equals("none")) bids.remove(0);
-            bids.add(new HashMap<>(){{
-                put("userId", userId);
-                put("bid", String.valueOf(yourBid));
+        if(bids.isEmpty()){
+            bids.add(new LotBid(){{
+                setUserId(userId);
+                setBid(yourBid);
             }});
-            lotFromDb.setBidPrices(bids);
+            lotFromDb.setLotBids(bids);
 
-            if(userLastBids.get("lotId").equals("none")) userBids.remove(0);
-            userBids.add(new HashMap<>(){{
-                put("lotId", id);
-                put("bid", String.valueOf(yourBid));
+            userBids.add(new UserBid(){{
+                setLotId(id);
+                setBid(yourBid);
             }});
-            userFromDb.setLotBids(userBids);
+            userFromDb.setUserBids(userBids);
+        } else {
+            LotBid lastBid = bids.get(bids.size()-1);
+            if(lastBid.getBid() <= yourBid && lotFromDb.getMinBid() <= yourBid && lastBid.getUserId() != userId) {
+                bids.add(new LotBid(){{
+                    setUserId(userId);
+                    setBid(yourBid);
+                }});
+                lotFromDb.setLotBids(bids);
+
+                userBids.add(new UserBid(){{
+                    setLotId(id);
+                    setBid(yourBid);
+                }});
+                userFromDb.setUserBids(userBids);
+            }
+            else throw new MyIOException();
         }
-        else throw new MyIOException();
+
         return lotFromDb;
     }
 
     @DeleteMapping("lots/{id}")
-    public void deleteLot(@PathVariable String id,
-                          @RequestParam String userId) {
+    public void deleteLot(@PathVariable Long id,
+                          @RequestParam Long userId) {
         LotDto lot = getLot(id);
-        UserDto user = getUser(userId);
-        List<Map<String, String>> userBuyLots = user.getBuyLots();
-        if(userBuyLots.get(0).get("lotId").equals("none")) {
-            userBuyLots.remove(0);
+        if(!lot.isArchive()) {
+            UserDto user = getUser(userId);
+            List<UserBuyout> userBuyLots = user.getUserBuyouts();
+            userBuyLots.add(new UserBuyout(){{
+                setLotId(id);
+                setBuyout(lot.getBuyout());
+            }});
+            user.setUserBuyouts(userBuyLots);
+            lot.setArchive(true);
         }
-        userBuyLots.add(new HashMap<>(){{
-            put("lotId", id);
-            put("buyout", Integer.toString(lot.getBuyoutPrice()));
-        }});
-        user.setBuyLots(userBuyLots);
-        lots.remove(lot);
+//        lots.remove(lot);
     }
 
     @GetMapping("users")
@@ -120,7 +133,7 @@ public class LotsController {
     }
 
     @GetMapping("users/{id}")
-    public UserDto getOneUser(@PathVariable String id){
+    public UserDto getOneUser(@PathVariable Long id){
         return getUser(id);
     }
 
@@ -128,18 +141,8 @@ public class LotsController {
     public UserDto createUser() {
         UserDto userDto = new UserDto(){{
             setId(counterUser++);
-            setLotBids(new ArrayList<>(){{
-                add(new HashMap<>(){{
-                    put("lotId", "none");
-                    put("bid", "0");
-                }});
-            }});
-            setBuyLots(new ArrayList<>(){{
-                add(new HashMap<>(){{
-                    put("lotId", "none");
-                    put("buyout", "0");
-                }});
-            }});
+            setUserBids(new ArrayList<>());
+            setUserBuyouts(new ArrayList<>());
         }};
         users.add(userDto);
         return userDto;
