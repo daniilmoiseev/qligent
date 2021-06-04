@@ -1,6 +1,5 @@
 package com.lottrading.ltt.dto;
 
-import com.lottrading.ltt.models.LotBid;
 import lombok.Data;
 
 import java.util.List;
@@ -13,5 +12,5 @@ public class LotDto {
     private int minBid;
     private int buyoutTime;
     private boolean archive;
-    private List<LotBid> lotBids;
+    private List<LotBidDto> lotBids;
 }
