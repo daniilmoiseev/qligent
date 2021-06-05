@@ -1,6 +1,8 @@
 package com.lottrading.ltt.models;
 
 import lombok.Data;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
@@ -25,17 +27,18 @@ public class Lot {
     @Column(name = "archive", nullable = false)
     private boolean archive;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "lot")
-    private List<LotBid> lotBids;
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "bid")
+    private List<Bid> bids;
 
     public Lot() {
     }
 
-    public Lot(String title, int buyout, int minBid, boolean archive, List<LotBid> lotBids) {
+    public Lot(String title, int buyout, int minBid, boolean archive, List<Bid> bids) {
         this.title = title;
         this.buyout = buyout;
         this.minBid = minBid;
         this.archive = archive;
-        this.lotBids = lotBids;
+        this.bids = bids;
     }
 }

@@ -17,18 +17,18 @@ public class User {
     private long id;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "userBid")
-    private List<UserBid> userBids;
+    @OneToMany(mappedBy = "bid")
+    private List<Bid> bids;
 
     @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(mappedBy = "userBuyout")
-    private List<UserBuyout> userBuyouts;
+    @OneToMany(mappedBy = "buyout")
+    private List<Buyout> buyouts;
 
     public User() {
     }
 
-    public User(List<UserBid> userBids, List<UserBuyout> userBuyouts) {
-        this.userBids = userBids;
-        this.userBuyouts = userBuyouts;
+    public User(List<Bid> bids, List<Buyout> buyouts) {
+        this.bids = bids;
+        this.buyouts = buyouts;
     }
 }

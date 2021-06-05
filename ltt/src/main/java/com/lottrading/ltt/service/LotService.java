@@ -1,6 +1,7 @@
 package com.lottrading.ltt.service;
 
 import com.lottrading.ltt.exception.MyIOException;
+import com.lottrading.ltt.exception.NotFoundException;
 import com.lottrading.ltt.models.*;
 import com.lottrading.ltt.repo.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,19 @@ public class LotService {
     private final LotRepository lotRepository;
 
     @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    public LotService(LotRepository lotRepository) {
+    @Autowired
+    private final BidService bidService;
+
+    @Autowired
+    private final BuyoutService buyoutService;
+
+    public LotService(LotRepository lotRepository, UserService userService, BidService bidService, BuyoutService buyoutService) {
         this.lotRepository = lotRepository;
+        this.userService = userService;
+        this.bidService = bidService;
+        this.buyoutService = buyoutService;
     }
 
     public Lot createLot(String title, int buyout, int minBid) {
@@ -30,64 +40,46 @@ public class LotService {
         Lot lot = getOneLot(lotId);
         if(!lot.isArchive()) {
             User user = userService.getOneUser(userId);
-            List<UserBuyout> userBuyouts = user.getUserBuyouts();
-            userBuyouts.add(new UserBuyout(){{
-                setLotId(lotId);
-                setBuyout(lot.getBuyout());
-            }});
-            user.setUserBuyouts(userBuyouts);
+            List<Buyout> buyouts = user.getBuyouts();
+            Buyout buyout = buyoutService.saveBuyout(lot, user);
+            buyouts.add(buyout);
+            user.setBuyouts(buyouts);
             lot.setArchive(true);
             userService.updateUser(user);
         }
         return lotRepository.saveAndFlush(lot);
     }
 
-    public Lot updateLot(long lotId, long userId, int bid) {
+    public Lot updateLot(long lotId, long userId, int yBid) {
         Lot lot = getOneLot(lotId);
-        List<LotBid> lotBids = lot.getLotBids();
+        List<Bid> bids = lot.getBids();
 
         User user = userService.getOneUser(userId);
-        List<UserBid> userBids = user.getUserBids();
 
-        if(lotBids.isEmpty()){
-            lotBids.add(new LotBid(){{
-                setUserId(userId);
-                setBid(bid);
-            }});
-            lot.setLotBids(lotBids);
-
-            userBids.add(new UserBid(){{
-                setLotId(lotId);
-                setBid(bid);
-            }});
-            user.setUserBids(userBids);
+        if(bids.isEmpty()){
+            Bid bid = bidService.saveBid(lot, user, yBid);
+            bids.add(bid);
+            lot.setBids(bids);
+            user.setBids(bids);
         } else {
-            LotBid lastBid = lotBids.get(lotBids.size()-1);
-            if(lastBid.getBid() <= bid && lot.getMinBid() <= bid && lastBid.getUserId() != userId) {
-                lotBids.add(new LotBid(){{
-                    setUserId(userId);
-                    setBid(bid);
-                }});
-                lot.setLotBids(lotBids);
-
-                userBids.add(new UserBid(){{
-                    setLotId(lotId);
-                    setBid(bid);
-                }});
-                user.setUserBids(userBids);
+            Bid lastBid = bids.get(bids.size()-1);
+            if(lastBid.getBid() < yBid && lot.getMinBid() <= yBid && lastBid.getUserId() != userId) {
+                Bid bid = bidService.saveBid(lot, user, yBid);
+                bids.add(bid);
+                lot.setBids(bids);
+                user.setBids(bids);
             }
             else throw new MyIOException();
         }
         userService.updateUser(user);
-
         return lotRepository.saveAndFlush(lot);
     }
 
     public List<Lot> findAll() {
-        return lotRepository.findAll();
+        return lotRepository.findAllNonArchive();
     }
 
     public Lot getOneLot(long id) {
-        return lotRepository.getOne(id);
+        return lotRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 }

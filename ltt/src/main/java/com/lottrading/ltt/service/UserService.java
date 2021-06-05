@@ -1,5 +1,6 @@
 package com.lottrading.ltt.service;
 
+import com.lottrading.ltt.exception.NotFoundException;
 import com.lottrading.ltt.models.User;
 import com.lottrading.ltt.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,6 @@ import java.util.List;
 public class UserService {
     @Autowired
     private final UserRepository userRepository;
-
-    @Autowired
-    private LotService lotService;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -34,6 +32,6 @@ public class UserService {
     }
 
     public User getOneUser(long id) {
-        return userRepository.getOne(id);
+        return userRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 }
