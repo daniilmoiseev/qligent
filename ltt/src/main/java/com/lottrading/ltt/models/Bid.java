@@ -24,10 +24,12 @@ public class Bid {
 //    @JoinColumn(name = "users_id")
 //    private User user;
 
-    @Column(name = "lotId")
+    //@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "lot_id")
     private long lotId;
 
-    @Column(name = "userId")
+    //@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "users_id")
     private long userId;
 
     public Bid() {

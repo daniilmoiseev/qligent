@@ -25,11 +25,11 @@ public class BidService {
         return bidRepository.saveAndFlush(bid);
     }
 
-    public List<Bid> findByLot(Lot lot) {
-        return bidRepository.findByLot(lot);
+    public List<Bid> findByLotId(long lotId) {
+        return bidRepository.findByLotId(lotId);
     }
 
-    public List<Bid> findByUser(User user) {
-        return bidRepository.findByUser(user);
+    public List<Bid> findByUserId(long userId) {
+        return bidRepository.findByUserId(userId);
     }
 }

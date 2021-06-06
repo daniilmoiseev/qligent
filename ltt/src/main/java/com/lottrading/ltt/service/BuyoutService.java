@@ -25,7 +25,7 @@ public class BuyoutService {
         return buyoutRepository.saveAndFlush(buyout);
     }
 
-    public List<Buyout> findByUser(User user) {
-        return buyoutRepository.findByUser(user);
+    public List<Buyout> findByUserId(long userId) {
+        return buyoutRepository.findByUserId(userId);
     }
 }

@@ -40,14 +40,11 @@ public class LotService {
         Lot lot = getOneLot(lotId);
         if(!lot.isArchive()) {
             User user = userService.getOneUser(userId);
-            List<Buyout> buyouts = user.getBuyouts();
-            Buyout buyout = buyoutService.saveBuyout(lot, user);
-            buyouts.add(buyout);
-            user.setBuyouts(buyouts);
+            buyoutService.saveBuyout(lot, user);
             lot.setArchive(true);
-            userService.updateUser(user);
+            lotRepository.saveAndFlush(lot);
         }
-        return lotRepository.saveAndFlush(lot);
+        return getOneLot(lotId);
     }
 
     public Lot updateLot(long lotId, long userId, int yBid) {
@@ -57,29 +54,40 @@ public class LotService {
         User user = userService.getOneUser(userId);
 
         if(bids.isEmpty()){
-            Bid bid = bidService.saveBid(lot, user, yBid);
-            bids.add(bid);
-            lot.setBids(bids);
-            user.setBids(bids);
+            bidService.saveBid(lot, user, yBid);
         } else {
             Bid lastBid = bids.get(bids.size()-1);
             if(lastBid.getBid() < yBid && lot.getMinBid() <= yBid && lastBid.getUserId() != userId) {
-                Bid bid = bidService.saveBid(lot, user, yBid);
-                bids.add(bid);
-                lot.setBids(bids);
-                user.setBids(bids);
+                bidService.saveBid(lot, user, yBid);
             }
             else throw new MyIOException();
         }
-        userService.updateUser(user);
-        return lotRepository.saveAndFlush(lot);
+        return getOneLot(lotId);
     }
 
     public List<Lot> findAll() {
-        return lotRepository.findAllNonArchive();
+        List<Lot> lots = lotRepository.findAllNonArchive();
+        lots.forEach(it -> {
+            List<Bid> bids = bidService.findByLotId(it.getId());
+            if(!bids.isEmpty()){
+                it.setBids(bids);
+            } else {
+                it.setBids(new ArrayList<>());
+            }
+//            it.setBids(bidService.findByLotId(it.getId()));
+        });
+        return lots;
     }
 
     public Lot getOneLot(long id) {
-        return lotRepository.findById(id).orElseThrow(NotFoundException::new);
+        Lot lot = lotRepository.findById(id).orElseThrow(NotFoundException::new);
+        List<Bid> bids = bidService.findByLotId(lot.getId());
+        if(!bids.isEmpty()){
+            lot.setBids(bids);
+        } else {
+            lot.setBids(new ArrayList<>());
+        }
+//        lot.setBids(bidService.findByLotId(lot.getId()));
+        return lot;
     }
 }
