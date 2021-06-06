@@ -32,18 +32,20 @@ public class LotService {
     }
 
     public Lot createLot(String title, int buyout, int minBid) {
-        Lot lot = new Lot(title, buyout, minBid, false, new ArrayList<>());
+        Lot lot = new Lot(title, buyout, minBid, 60, false, new ArrayList<>());
         return lotRepository.saveAndFlush(lot);
     }
 
     public Lot deleteLot(long lotId, long userId) {
         Lot lot = getOneLot(lotId);
-        if(!lot.isArchive()) {
-            User user = userService.getOneUser(userId);
+        User user = userService.getOneUser(userId);
+        if(!lot.isArchive() && user.getCash() >= lot.getBuyout()) {
+            user.setCash(user.getCash() - lot.getBuyout());
+            userService.updateUser(user);
             buyoutService.saveBuyout(lot, user);
             lot.setArchive(true);
             lotRepository.saveAndFlush(lot);
-        }
+        } else throw new MyIOException();
         return getOneLot(lotId);
     }
 
@@ -54,10 +56,11 @@ public class LotService {
         User user = userService.getOneUser(userId);
 
         if(bids.isEmpty()){
-            bidService.saveBid(lot, user, yBid);
+            if(user.getCash() >= yBid && lot.getMinBid() <= yBid) bidService.saveBid(lot, user, yBid);
+            else throw new MyIOException();
         } else {
             Bid lastBid = bids.get(bids.size()-1);
-            if(lastBid.getBid() < yBid && lot.getMinBid() <= yBid && lastBid.getUserId() != userId) {
+            if(lastBid.getBid() < yBid && lot.getMinBid() <= yBid && lastBid.getUserId() != userId && user.getCash() >= yBid) {
                 bidService.saveBid(lot, user, yBid);
             }
             else throw new MyIOException();

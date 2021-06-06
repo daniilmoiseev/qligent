@@ -7,6 +7,7 @@ import com.lottrading.ltt.repo.BidRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,6 +23,7 @@ public class BidService {
         Bid bid = new Bid(yBid);
         bid.setLotId(lot.getId());
         bid.setUserId(user.getId());
+        bid.setTimestamp(LocalDateTime.now());
         return bidRepository.saveAndFlush(bid);
     }
 

@@ -34,10 +34,11 @@ public class Lot {
     public Lot() {
     }
 
-    public Lot(String title, int buyout, int minBid, boolean archive, List<Bid> bids) {
+    public Lot(String title, int buyout, int minBid, int buyoutTime, boolean archive, List<Bid> bids) {
         this.title = title;
         this.buyout = buyout;
         this.minBid = minBid;
+        this.buyoutTime = buyoutTime;
         this.archive = archive;
         this.bids = bids;
     }

@@ -16,6 +16,9 @@ public class User {
     @Column(name = "id", nullable = false)
     private long id;
 
+    @Column(name = "cash")
+    private int cash;
+
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "bid")
     private List<Bid> bids;
@@ -27,7 +30,8 @@ public class User {
     public User() {
     }
 
-    public User(List<Bid> bids, List<Buyout> buyouts) {
+    public User(int cash, List<Bid> bids, List<Buyout> buyouts) {
+        this.cash = cash;
         this.bids = bids;
         this.buyouts = buyouts;
     }

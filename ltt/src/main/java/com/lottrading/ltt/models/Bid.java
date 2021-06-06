@@ -1,8 +1,10 @@
 package com.lottrading.ltt.models;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -16,6 +18,9 @@ public class Bid {
     @Column(name = "bid")
     private int bid;
 
+    @Column(name = "timestamp", nullable = false)
+    private LocalDateTime timestamp;
+
 //    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 //    @JoinColumn(name = "lot_id")
 //    private Lot lot;
@@ -24,11 +29,9 @@ public class Bid {
 //    @JoinColumn(name = "users_id")
 //    private User user;
 
-    //@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "lot_id")
     private long lotId;
 
-    //@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "users_id")
     private long userId;
 

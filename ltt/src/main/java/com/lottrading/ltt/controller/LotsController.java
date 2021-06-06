@@ -65,7 +65,7 @@ public class LotsController {
     }
 
     @PostMapping("users")
-    public User createUser() {
-        return userService.createUser();
+    public User createUser(@RequestParam int cash) {
+        return userService.createUser(cash);
     }
 }

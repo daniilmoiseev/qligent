@@ -26,8 +26,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User createUser() {
-        User user = new User(new ArrayList<>(), new ArrayList<>());
+    public User createUser(int cash) {
+        User user = new User(cash, new ArrayList<>(), new ArrayList<>());
         return userRepository.saveAndFlush(user);
     }
 
