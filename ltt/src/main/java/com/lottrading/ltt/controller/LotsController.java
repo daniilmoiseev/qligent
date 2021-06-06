@@ -1,147 +1,71 @@
 package com.lottrading.ltt.controller;
 
-import com.lottrading.ltt.dto.LotDto;
-import com.lottrading.ltt.dto.UserDto;
-import com.lottrading.ltt.exception.MyIOException;
-import com.lottrading.ltt.exception.NotFoundException;
+import com.lottrading.ltt.models.Lot;
+import com.lottrading.ltt.models.User;
+import com.lottrading.ltt.service.LotService;
+import com.lottrading.ltt.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping
 public class LotsController {
 
-    private long counterLot = 1;
-    private long counterUser = 1;
-    private int time = 30;
-    private List<LotDto> lots = new ArrayList<>();
-    private List<UserDto> users = new ArrayList<>();
+    @Autowired
+    private final UserService userService;
+
+    @Autowired
+    private final LotService lotService;
+
+    public LotsController(UserService userService, LotService lotService) {
+        this.userService = userService;
+        this.lotService = lotService;
+    }
 
     @GetMapping("lots")
-    public List<LotDto> list(){
-        return lots;
+    public List<Lot> findAllLots(){
+        return lotService.findAll();
     }
 
     @GetMapping("lots/{id}")
-    public LotDto getOneLot(@PathVariable String id){
-        return getLot(id);
-    }
-
-    public LotDto getLot(@PathVariable String id){
-        return lots.stream()
-                .filter(lot -> Long.toString(lot.getId()).equals(id))
-                .findFirst()
-                .orElseThrow(NotFoundException::new);
-    }
-
-    public UserDto getUser(@PathVariable String id){
-        return users.stream()
-                .filter(user -> Long.toString(user.getId()).equals(id))
-                .findFirst()
-                .orElseThrow(NotFoundException::new);
+    public Lot getOneLot(@PathVariable Long id){
+        return lotService.getOneLot(id);
     }
 
     @PostMapping("lots")
-    public LotDto createLot(@RequestParam String title,
+    public Lot createLot(@RequestParam String title,
                          @RequestParam int buyout,
                          @RequestParam int minBid) {
-        LotDto lotDto = new LotDto(){{
-            setId(counterLot++);
-            setTitle(title);
-            setBuyoutPrice(buyout);
-            setMinBidPrice(minBid);
-            setBuyoutTime(time);
-            setBidPrices(new ArrayList<>(){{
-                add(new HashMap<>(){{
-                    put("userId", "none");
-                    put("bid", "0");
-                }});
-            }});
-        }};
-        lots.add(lotDto);
-        return lotDto;
+        return lotService.createLot(title, buyout, minBid);
     }
 
     @PutMapping("lots")
-    public LotDto updateLot(@RequestParam String id,
-                            @RequestParam String userId,
-                            @RequestParam int yourBid) {
-        LotDto lotFromDb = getLot(id);
-        List<Map<String, String>> bids = lotFromDb.getBidPrices();
-        Map<String, String> lastBids = bids.get(bids.size()-1);
-
-        UserDto userFromDb = getUser(userId);
-        List<Map<String, String>> userBids = userFromDb.getLotBids();
-        Map<String, String> userLastBids = userBids.get(userBids.size()-1);
-
-        if(Integer.parseInt(lastBids.get("bid")) <= yourBid && lotFromDb.getMinBidPrice() <= yourBid && !lastBids.get("userId").equals(userId)) {
-            if(lastBids.get("userId").equals("none")) bids.remove(0);
-            bids.add(new HashMap<>(){{
-                put("userId", userId);
-                put("bid", String.valueOf(yourBid));
-            }});
-            lotFromDb.setBidPrices(bids);
-
-            if(userLastBids.get("lotId").equals("none")) userBids.remove(0);
-            userBids.add(new HashMap<>(){{
-                put("lotId", id);
-                put("bid", String.valueOf(yourBid));
-            }});
-            userFromDb.setLotBids(userBids);
-        }
-        else throw new MyIOException();
-        return lotFromDb;
+    public Lot updateLot(@RequestParam Long id,
+                         @RequestParam Long userId,
+                         @RequestParam int yourBid) {
+        return lotService.updateLot(id, userId, yourBid);
     }
 
     @DeleteMapping("lots/{id}")
-    public void deleteLot(@PathVariable String id,
-                          @RequestParam String userId) {
-        LotDto lot = getLot(id);
-        UserDto user = getUser(userId);
-        List<Map<String, String>> userBuyLots = user.getBuyLots();
-        if(userBuyLots.get(0).get("lotId").equals("none")) {
-            userBuyLots.remove(0);
-        }
-        userBuyLots.add(new HashMap<>(){{
-            put("lotId", id);
-            put("buyout", Integer.toString(lot.getBuyoutPrice()));
-        }});
-        user.setBuyLots(userBuyLots);
-        lots.remove(lot);
+    public void deleteLot(@PathVariable Long id,
+                          @RequestParam Long userId) {
+        lotService.deleteLot(id, userId);
     }
 
     @GetMapping("users")
-    public List<UserDto> listUser(){
-        return users;
+    public List<User> findAllUsers(){
+        return userService.findAll();
     }
 
     @GetMapping("users/{id}")
-    public UserDto getOneUser(@PathVariable String id){
-        return getUser(id);
+    public User getOneUser(@PathVariable Long id){
+        return userService.getOneUser(id);
     }
 
     @PostMapping("users")
-    public UserDto createUser() {
-        UserDto userDto = new UserDto(){{
-            setId(counterUser++);
-            setLotBids(new ArrayList<>(){{
-                add(new HashMap<>(){{
-                    put("lotId", "none");
-                    put("bid", "0");
-                }});
-            }});
-            setBuyLots(new ArrayList<>(){{
-                add(new HashMap<>(){{
-                    put("lotId", "none");
-                    put("buyout", "0");
-                }});
-            }});
-        }};
-        users.add(userDto);
-        return userDto;
+    public User createUser(@RequestParam int cash) {
+        return userService.createUser(cash);
     }
 }

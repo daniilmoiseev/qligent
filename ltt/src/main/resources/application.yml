@@ -1,1 +1,14 @@
-
+spring:
+  jpa:
+    database: postgresql
+    show-sql: true
+    #generate-ddl: true
+    hibernate:
+      ddl-auto: create
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/qligent
+    username: postgres
+    password: Danila2012
+    driverClassName: org.postgresql.Driver
+    #type: org.apache.tomcat.jdbc.pool.DataSource
