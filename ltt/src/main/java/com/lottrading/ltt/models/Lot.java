@@ -23,6 +23,7 @@ public class Lot {
     private int buyout;
     @Column(name = "minbid")
     private int minBid;
+    @Column(name = "buyouttime")
     private int buyoutTime;
     @Column(name = "archive", nullable = false)
     private boolean archive;

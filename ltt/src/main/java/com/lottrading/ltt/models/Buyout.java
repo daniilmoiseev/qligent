@@ -3,7 +3,7 @@ package com.lottrading.ltt.models;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @Entity
@@ -17,8 +17,8 @@ public class Buyout {
     @Column(name = "buyout")
     private int buyout;
 
-    @Column(name = "timestamp", nullable = false)
-    private LocalDateTime timestamp;
+    @Column(name = "zonedDateTime", nullable = false)
+    private ZonedDateTime zonedDateTime;
 
 //    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 //    @JoinColumn(name = "lot_id")

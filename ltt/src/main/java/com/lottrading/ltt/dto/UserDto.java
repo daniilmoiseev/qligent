@@ -1,12 +1,15 @@
 package com.lottrading.ltt.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Builder
 public class UserDto {
     private long id;
-    private List<UserBidDto> userBids;
-    private List<UserBuyoutDto> userBuyouts;
+    private int cash;
+    private List<BidDto> bids;
+    private List<BuyoutDto> buyouts;
 }
