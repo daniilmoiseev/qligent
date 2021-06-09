@@ -36,15 +36,15 @@ public class LotsController {
 
     @PostMapping("lots")
     public LotDto createLot(@RequestParam String title,
-                         @RequestParam int buyout,
-                         @RequestParam int minBid) {
+                            @RequestParam int buyout,
+                            @RequestParam int minBid) {
         return lotService.createLot(title, buyout, minBid);
     }
 
     @PutMapping("lots")
     public LotDto offerBid(@RequestParam Long id,
-                            @RequestParam Long userId,
-                            @RequestParam int yourBid) {
+                           @RequestParam Long userId,
+                           @RequestParam int yourBid) {
         return lotService.offerBid(id, userId, yourBid);
     }
 

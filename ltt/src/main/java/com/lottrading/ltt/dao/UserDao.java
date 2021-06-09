@@ -10,6 +10,7 @@ import com.lottrading.ltt.models.User;
 import com.lottrading.ltt.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,7 @@ public class UserDao {
         return userDto;
     }
 
+    @Transactional(readOnly = true)
     public List<UserDto> findAll() {
         List<User> users = userRepository.findAll();
         List<UserDto> userDtoList = new ArrayList<>();
@@ -76,6 +78,7 @@ public class UserDao {
         return userDtoList;
     }
 
+    @Transactional(readOnly = true)
     public UserDto getOneUser(long id) {
         User user = userRepository.findById(id).orElseThrow(NotFoundException::new);
         UserDto userDto = userToDtoConverter.convert(user);

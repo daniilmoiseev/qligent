@@ -1,8 +1,6 @@
 package com.lottrading.ltt.models;
 
 import lombok.Data;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
@@ -19,11 +17,9 @@ public class User {
     @Column(name = "cash")
     private int cash;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "bid")
     private List<Bid> bids;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "buyout")
     private List<Buyout> buyouts;
 

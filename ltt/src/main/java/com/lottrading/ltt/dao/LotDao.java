@@ -11,6 +11,7 @@ import com.lottrading.ltt.models.Lot;
 import com.lottrading.ltt.repo.LotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class LotDao {
         if(!lotDto.isArchive() && userDto.getCash() >= buyout) {
             userDto.setCash(userDto.getCash() - buyout);
             userDao.updateUser(userDto);
-            buyoutDao.saveBuyout(lotDto, userDto);
+            buyoutDao.saveBuyout(lotDto, userDto, buyout);
             lotDto.setArchive(true);
             Lot lot = lotToEntityConverter.convert(lotDto);
             lotRepository.saveAndFlush(lot);
@@ -77,7 +78,7 @@ public class LotDao {
             else throw new MyIOException();
         } else {
             BidDto lastBid = bids.get(bids.size()-1);
-            if(lastBid.getBid() < yBid && lotDto.getMinBid() <= yBid && lastBid.getUserId() != userId && userDto.getCash() >= yBid) {
+            if(lastBid.getBid() < yBid && lotDto.getMinBid() <= yBid && lastBid.getUserId() != userId && userDto.getCash() >= yBid && lotDto.getBuyoutTime() > 0) {
                 bidDao.saveBid(lotDto, userDto, yBid);
             }
             else throw new MyIOException();
@@ -85,8 +86,9 @@ public class LotDao {
         return getOneLot(lotId);
     }
 
+    @Transactional(readOnly = true)
     public List<LotDto> findAll() {
-        List<Lot> lots = lotRepository.findAllNonArchive();
+        List<Lot> lots = lotRepository.findByArchiveIsFalse();
         List<LotDto> lotDtoList = new ArrayList<>();
         lots.forEach(it -> {
             LotDto lotDto = lotToDtoConverter.convert(it);
@@ -104,6 +106,7 @@ public class LotDao {
         return lotDtoList;
     }
 
+    @Transactional(readOnly = true)
     public LotDto getOneLot(long id) {
         Lot lot = lotRepository.findById(id).orElseThrow(NotFoundException::new);
         LotDto lotDto = lotToDtoConverter.convert(lot);

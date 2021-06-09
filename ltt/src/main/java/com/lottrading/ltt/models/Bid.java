@@ -20,18 +20,18 @@ public class Bid {
     @Column(name = "zonedDateTime", nullable = false)
     private ZonedDateTime zonedDateTime;
 
-//    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    @ManyToOne
 //    @JoinColumn(name = "lot_id")
 //    private Lot lot;
 //
-//    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    @ManyToOne
 //    @JoinColumn(name = "users_id")
 //    private User user;
 
-    @JoinColumn(name = "lot_id")
+    @Column
     private long lotId;
 
-    @JoinColumn(name = "users_id")
+    @Column
     private long userId;
 
     public Bid() {

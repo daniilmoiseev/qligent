@@ -13,6 +13,8 @@ public class BuyoutToDtoConverter implements Converter<Buyout, BuyoutDto> {
         return BuyoutDto.builder()
                 .id(source.getId())
                 .buyout(source.getBuyout())
+//                .lotId(source.getLot().getId())
+//                .userId(source.getUser().getId())
                 .lotId(source.getLotId())
                 .userId(source.getUserId())
                 .zonedDateTime(source.getZonedDateTime())

@@ -12,6 +12,7 @@ import com.lottrading.ltt.models.User;
 import com.lottrading.ltt.repo.BidRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -39,16 +40,19 @@ public class BidDao {
     }
 
     public BidDto saveBid(LotDto lotDto, UserDto userDto, int yBid) {
-        Lot lot = lotToEntityConverter.convert(lotDto);
-        User user = userToEntityConverter.convert(userDto);
+//        Lot lot = lotToEntityConverter.convert(lotDto);
+//        User user = userToEntityConverter.convert(userDto);
         Bid bid = new Bid(yBid);
-        bid.setLotId(lot.getId());
-        bid.setUserId(user.getId());
+//        bid.setLot(lot);
+//        bid.setUser(user);
+        bid.setLotId(lotDto.getId());
+        bid.setUserId(userDto.getId());
         bid.setZonedDateTime(ZonedDateTime.now());
         bidRepository.saveAndFlush(bid);
         return bidToDtoConverter.convert(bid);
     }
 
+    @Transactional(readOnly = true)
     public List<BidDto> findByLotId(long lotId) {
         List<Bid> bidList = bidRepository.findByLotId(lotId);
         List<BidDto> bidDtoList = new ArrayList<>();
@@ -59,6 +63,7 @@ public class BidDao {
         return bidDtoList;
     }
 
+    @Transactional(readOnly = true)
     public List<BidDto> findByUserId(long userId) {
         List<Bid> bidList = bidRepository.findByUserId(userId);
         List<BidDto> bidDtoList = new ArrayList<>();
