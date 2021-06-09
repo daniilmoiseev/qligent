@@ -16,7 +16,7 @@ public class CheckTimeBuyoutLotConfig {
     @Autowired
     private LotService lotService;
 
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 60000)
     public void checkTime(){
         List<LotDto> lots = lotService.findAll();
         if(!lots.isEmpty()) {

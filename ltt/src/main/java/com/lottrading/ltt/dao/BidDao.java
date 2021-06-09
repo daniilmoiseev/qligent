@@ -1,14 +1,10 @@
 package com.lottrading.ltt.dao;
 
 import com.lottrading.ltt.converter.BidToDtoConverter;
-import com.lottrading.ltt.converter.LotToEntityConverter;
-import com.lottrading.ltt.converter.UserToEntityConverter;
 import com.lottrading.ltt.dto.BidDto;
 import com.lottrading.ltt.dto.LotDto;
 import com.lottrading.ltt.dto.UserDto;
 import com.lottrading.ltt.models.Bid;
-import com.lottrading.ltt.models.Lot;
-import com.lottrading.ltt.models.User;
 import com.lottrading.ltt.repo.BidRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,25 +22,13 @@ public class BidDao {
     @Autowired
     private final BidToDtoConverter bidToDtoConverter;
 
-    @Autowired
-    private final UserToEntityConverter userToEntityConverter;
-
-    @Autowired
-    private final LotToEntityConverter lotToEntityConverter;
-
-    public BidDao(BidRepository bidRepository, BidToDtoConverter bidToDtoConverter, UserToEntityConverter userToEntityConverter, LotToEntityConverter lotToEntityConverter) {
+    public BidDao(BidRepository bidRepository, BidToDtoConverter bidToDtoConverter) {
         this.bidRepository = bidRepository;
         this.bidToDtoConverter = bidToDtoConverter;
-        this.userToEntityConverter = userToEntityConverter;
-        this.lotToEntityConverter = lotToEntityConverter;
     }
 
     public BidDto saveBid(LotDto lotDto, UserDto userDto, int yBid) {
-//        Lot lot = lotToEntityConverter.convert(lotDto);
-//        User user = userToEntityConverter.convert(userDto);
         Bid bid = new Bid(yBid);
-//        bid.setLot(lot);
-//        bid.setUser(user);
         bid.setLotId(lotDto.getId());
         bid.setUserId(userDto.getId());
         bid.setZonedDateTime(ZonedDateTime.now());

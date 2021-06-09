@@ -13,8 +13,6 @@ public class BidToDtoConverter implements Converter<Bid, BidDto> {
         return BidDto.builder()
                 .id(source.getId())
                 .bid(source.getBid())
-//                .lotId(source.getLot().getId())
-//                .userId(source.getUser().getId())
                 .lotId(source.getLotId())
                 .userId(source.getUserId())
                 .zonedDateTime(source.getZonedDateTime())

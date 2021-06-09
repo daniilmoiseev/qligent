@@ -11,10 +11,10 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private long id;
 
-    @Column(name = "cash")
+    @Column
     private int cash;
 
     @OneToMany(mappedBy = "bid")

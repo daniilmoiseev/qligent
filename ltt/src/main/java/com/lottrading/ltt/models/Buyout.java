@@ -11,22 +11,14 @@ import java.time.ZonedDateTime;
 public class Buyout {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private long id;
 
-    @Column(name = "buyout")
+    @Column
     private int buyout;
 
-    @Column(name = "zonedDateTime", nullable = false)
+    @Column(nullable = false)
     private ZonedDateTime zonedDateTime;
-
-//    @ManyToOne
-//    @JoinColumn(name = "lot_id")
-//    private Lot lot;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "users_id")
-//    private User user;
 
     @Column
     private long lotId;
