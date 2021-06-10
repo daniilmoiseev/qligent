@@ -1,8 +1,8 @@
 spring:
   jpa:
     database: postgresql
-    show-sql: true
-    #generate-ddl: true
+    show-sql: false
+    #generate-ddl: false
     hibernate:
       ddl-auto: validate
   datasource:

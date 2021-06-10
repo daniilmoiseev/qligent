@@ -6,6 +6,7 @@ import com.lottrading.ltt.repo.LotRepository;
 import com.lottrading.ltt.service.LotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -23,7 +24,8 @@ public class EditTimeBuyoutLotConfig {
     @Autowired
     private LotToEntityConverter lotToEntityConverter;
 
-    @Scheduled(fixedDelay = 1000)
+    @Async
+    @Scheduled(fixedRate = 1000)
     public void editTime(){
         List<LotDto> lots = lotService.findAll();
         if(!lots.isEmpty()) {
