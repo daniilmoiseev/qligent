@@ -5,8 +5,8 @@ plugins {
 }
 
 group = 'com.lottrading'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+version = '0.1'
+sourceCompatibility = '14'
 
 configurations {
 	compileOnly {
