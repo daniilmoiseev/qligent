@@ -1,8 +1,6 @@
 package com.lottrading.ltt.models;
 
 import lombok.Data;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,20 +12,24 @@ public class Lot {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private long id;
 
-    @Column(name = "title")
+    @Column
     private String title;
-    @Column(name = "buyout")
+
+    @Column
     private int buyout;
-    @Column(name = "minbid")
+
+    @Column
     private int minBid;
+
+    @Column
     private int buyoutTime;
-    @Column(name = "archive", nullable = false)
+
+    @Column(nullable = false)
     private boolean archive;
 
-    @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(mappedBy = "bid")
     private List<Bid> bids;
 

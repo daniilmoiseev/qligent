@@ -1,10 +1,9 @@
 package com.lottrading.ltt.models;
 
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @Entity
@@ -12,27 +11,19 @@ import java.time.LocalDateTime;
 public class Bid {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(nullable = false)
     private long id;
 
-    @Column(name = "bid")
+    @Column
     private int bid;
 
-    @Column(name = "timestamp", nullable = false)
-    private LocalDateTime timestamp;
+    @Column(nullable = false)
+    private ZonedDateTime zonedDateTime;
 
-//    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    @JoinColumn(name = "lot_id")
-//    private Lot lot;
-//
-//    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    @JoinColumn(name = "users_id")
-//    private User user;
-
-    @JoinColumn(name = "lot_id")
+    @Column
     private long lotId;
 
-    @JoinColumn(name = "users_id")
+    @Column
     private long userId;
 
     public Bid() {
