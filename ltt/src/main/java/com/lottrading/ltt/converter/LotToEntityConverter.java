@@ -10,8 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LotToEntityConverter implements Converter<LotDto, Lot> {
-    @Autowired
+
     private LotRepository lotRepository;
+
+    public LotToEntityConverter(LotRepository lotRepository) {
+        this.lotRepository = lotRepository;
+    }
 
     @Override
     public Lot convert(LotDto source) {

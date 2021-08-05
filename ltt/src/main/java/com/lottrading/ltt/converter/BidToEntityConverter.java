@@ -10,8 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BidToEntityConverter implements Converter<BidDto, Bid> {
-    @Autowired
+
     private BidRepository bidRepository;
+
+    public BidToEntityConverter(BidRepository bidRepository) {
+        this.bidRepository = bidRepository;
+    }
 
     @Override
     public Bid convert(BidDto source) {

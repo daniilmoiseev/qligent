@@ -10,8 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BuyoutToEntityConverter implements Converter<BuyoutDto, Buyout> {
-    @Autowired
+
     private BuyoutRepository buyoutRepository;
+
+    public BuyoutToEntityConverter(BuyoutRepository buyoutRepository) {
+        this.buyoutRepository = buyoutRepository;
+    }
 
     @Override
     public Buyout convert(BuyoutDto source) {

@@ -10,8 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class UserToEntityConverter implements Converter<UserDto, User> {
-    @Autowired
+
     private UserRepository userRepository;
+
+    public UserToEntityConverter(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public User convert(UserDto source) {
