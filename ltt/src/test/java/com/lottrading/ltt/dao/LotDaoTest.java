@@ -8,6 +8,8 @@ import com.lottrading.ltt.repo.BuyoutRepository;
 import com.lottrading.ltt.repo.LotRepository;
 import com.lottrading.ltt.repo.UserRepository;
 import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -39,6 +41,22 @@ class LotDaoTest {
     private BidRepository bidRepo;
     @Autowired
     private BuyoutRepository buyoutRepo;
+
+    @BeforeEach
+    public void init() {
+        lotRepo.deleteAll();
+        userRepo.deleteAll();
+        bidRepo.deleteAll();
+        buyoutRepo.deleteAll();
+    }
+
+    @AfterEach
+    public void teardown() {
+        lotRepo.deleteAll();
+        userRepo.deleteAll();
+        bidRepo.deleteAll();
+        buyoutRepo.deleteAll();
+    }
 
     @Test
     void createLot() {

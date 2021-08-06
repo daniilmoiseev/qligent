@@ -1,30 +1,25 @@
 package com.lottrading.ltt.controller;
 
-import com.lottrading.ltt.dao.BidDao;
-import com.lottrading.ltt.dao.BuyoutDao;
 import com.lottrading.ltt.dao.LotDao;
 import com.lottrading.ltt.dao.UserDao;
 import com.lottrading.ltt.dto.LotDto;
 import com.lottrading.ltt.dto.UserDto;
-import com.lottrading.ltt.repo.BidRepository;
-import com.lottrading.ltt.repo.BuyoutRepository;
 import com.lottrading.ltt.repo.LotRepository;
 import com.lottrading.ltt.repo.UserRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.jupiter.api.Assertions.*;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders. *;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest
@@ -38,6 +33,23 @@ class LotsControllerTest {
     private LotDao lotDao;
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private LotRepository lotRepo;
+    @Autowired
+    private UserRepository userRepo;
+
+    @BeforeEach
+    public void init() {
+        lotRepo.deleteAll();
+        userRepo.deleteAll();
+    }
+
+    @AfterEach
+    public void teardown() {
+        lotRepo.deleteAll();
+        userRepo.deleteAll();
+    }
 
     @Test
     void findAllLots() throws Exception {
@@ -126,7 +138,7 @@ class LotsControllerTest {
         UserDto userDto = userDao.createUser(100);
         String lotId = Long.toString(lotDto.getId());
         String userId = Long.toString(userDto.getId());
-        this.mockMvc.perform(delete("/lots/1").param("id", lotId).param("userId", userId))
+        this.mockMvc.perform(delete("/lots/"+lotId).param("id", lotId).param("userId", userId))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
