@@ -16,12 +16,11 @@ import com.lottrading.ltt.repo.BidRepository;
 import com.lottrading.ltt.repo.BuyoutRepository;
 import com.lottrading.ltt.repo.LotRepository;
 import com.lottrading.ltt.repo.UserRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.ArrayList;
 
@@ -29,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class SpringConverterTest {
 
     @Autowired
@@ -50,22 +50,6 @@ public class SpringConverterTest {
     private UserDao userDao;
     @Autowired
     private UserRepository userRepo;
-
-    @BeforeEach
-    public void init() {
-        lotRepo.deleteAll();
-        userRepo.deleteAll();
-        bidRepo.deleteAll();
-        buyoutRepo.deleteAll();
-    }
-
-    @AfterEach
-    public void teardown() {
-        lotRepo.deleteAll();
-        userRepo.deleteAll();
-        bidRepo.deleteAll();
-        buyoutRepo.deleteAll();
-    }
 
     @Test
     void convertBidToEntity() {

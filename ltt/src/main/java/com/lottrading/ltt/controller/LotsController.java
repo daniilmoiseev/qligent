@@ -1,7 +1,9 @@
 package com.lottrading.ltt.controller;
 
+import com.lottrading.ltt.dto.AllLotsDto;
 import com.lottrading.ltt.dto.LotDto;
 import com.lottrading.ltt.dto.UserDto;
+import com.lottrading.ltt.dto.AllUsersDto;
 import com.lottrading.ltt.service.LotService;
 import com.lottrading.ltt.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +27,8 @@ public class LotsController {
     }
 
     @GetMapping("lots")
-    public List<LotDto> findAllLots(){
-        return lotService.findAll();
+    public AllLotsDto findAllLots(){
+        return AllLotsDto.builder().lots(lotService.findAll()).build();
     }
 
     @GetMapping("lots/{id}")
@@ -55,8 +57,8 @@ public class LotsController {
     }
 
     @GetMapping("users")
-    public List<UserDto> findAllUsers(){
-        return userService.findAll();
+    public AllUsersDto findAllUsers(){
+        return AllUsersDto.builder().users(userService.findAll()).build();
     }
 
     @GetMapping("users/{id}")

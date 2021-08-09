@@ -19,13 +19,13 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -57,9 +57,8 @@ class LotTradingApplicationTests {
 		this.mockMvc.perform(get("/lots"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json"))
-				.andExpect(content().string(containsString("\"bids\":[]")))
-				.andExpect(content().string(containsString("\"archive\":false")));
+				.andExpect(jsonPath("lots[0].archive").value(false))
+				.andExpect(jsonPath("lots[0].bids", hasSize(0)));
 	}
 
 	@Test
@@ -77,9 +76,8 @@ class LotTradingApplicationTests {
 		this.mockMvc.perform(get("/lots/2"))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json"))
-				.andExpect(content().string(containsString("\"bid\":150")))
-				.andExpect(content().string(containsString("\"archive\":true")));
+				.andExpect(jsonPath("bids[0].bid").value(150))
+				.andExpect(jsonPath("archive").value(true));
 	}
 
 	@Test
@@ -110,8 +108,7 @@ class LotTradingApplicationTests {
 		this.mockMvc.perform(get("/lots/1").accept(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json"))
-				.andExpect(content().string(containsString("\"bid\":100")));
+				.andExpect(jsonPath("bids[0].bid").value(100));
 	}
 
 }
