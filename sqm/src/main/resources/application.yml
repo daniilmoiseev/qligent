@@ -1,0 +1,38 @@
+spring:
+  kafka:
+    producer:
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: sqm
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+    bootstrap-servers: 192.168.193.92:9092
+    client-id: client
+    topic: "qligent-kafka"
+  cease:
+    type: POST
+    body: "/hi/there?foo1=${properties}&foo2=${extras}"
+    url: "https://postman-echo.com/post"
+  rise:
+    type: GET
+    url: "https://postman-echo.com/get?foo1=${properties}&foo2=${extras}"
+
+server:
+  port: 9090
+
+#sqm:
+#  kafka:
+#    sqm:
+#      allowed-target-instances: dev, test
+#      request-topic: notification-topic
+#      response-topic: crmagent-response
+#  webservices:
+#    crm:
+#      wsdl-location: classpath:wsdl/crm/ExtCaseManagementService_1.wsdl
+#      default-uri: http://OUTSTAFFPC3:8088/mockExtCaseManagementServiceSOAP
+#      max-attempts: 3
+#      soap-operations:
+#        create-update-case: http://www.rt.ru/integration/adapter/sqm/services/extcasemanagement/NewOperation
+#  tasks:
+#    resend-failed-requests:
+#      fixed-delay: 30000
