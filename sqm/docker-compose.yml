@@ -1,0 +1,60 @@
+version: "3.3"
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - sqm_network
+
+    kafka:
+      image: wurstmeister/kafka
+      ports:
+        - "9092:9092"
+      environment:
+        KAFKA_ADVERTISED_HOST_NAME: 192.168.193.92
+        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+        KAFKA_CREATE_TOPICS: "crmagent-request:1:1,crmagent-response:1:1"
+      networks:
+        - sqm_network
+      depends_on:
+        - zookeeper
+
+sqm:
+  image: sqm
+  environment:
+    SPRING_PROFILE: dev, dict
+    KAFKA_BOOTSTRAP_SERVERS: 192.168.193.92:9092
+    KAFKA_CLIENT_ID: client
+    KAFKA_SQM_ALLOWED_TARGET_INSTANCES: dev, test
+    KAFKA_SQM_REQUEST_TOPIC: sqm-request
+    KAFKA_SQM_RESPONSE_TOPIC: sqm-response
+    KAFKA_SQM_RETRY_TOPIC: sqm-request
+    WS_CRM_WSDL_LOCATION: classpath:wsdl/crm/ExtCaseManagementService_1.wsdl
+    WS_CRM_DEFAULT_URI: http://OUTSTAFFPC3:8088/mockExtCaseManagementServiceSOAP
+    WS_CRM_MAX_ATTEMPTS: 3
+    TASKS_RESEND_FAILED_REQUEST_DELAY: 180000
+    JAVA_OPTS: "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+  ports:
+    - 8080:8080
+  networks:
+    - sqm_network
+  depends_on:
+    - kafka
+
+  config-server:
+    image: registry-sqm.qligent.com/qligent_sqm/dictionary:3.0.9
+    container_name: configserver
+    hostname: configserver
+    environment:
+      JAVA_OPTS: -Xms512m -Xmx1024m
+      SPRING_CLOUD_CONFIG_SERVER_GIT_CLONE_ON_START: 'true'
+      SPRING_CLOUD_CONFIG_SERVER_GIT_PASSWORD: builder!
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://gitlab-sqm.qligent.com/qligent_sqm/dictionary-repository.git
+      SPRING_CLOUD_CONFIG_SERVER_GIT_USER: builder
+    ports:
+      - "8888:8888"
+
+networks:
+  sqm_network:
+    driver: bridge
