@@ -1,0 +1,4 @@
+rootProject.name = 'internat-project'
+include 'api', 'augmentator', 'backend', 'composer', 'emulator'
+include 'clickhouse'
+

@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: augmentator
+
+server:
+  port: 8080
+
+kafka:
+  bootstrap-servers: localhost:9092
+  parcel-raw-topic: parcel-raw
+  enrich-raw-topic: enrich-raw
+  parcel-drop-topic: parcel-drop
+  complete-out-topic: complete-out
+  consumer:
+    consumer-group: complexas-int-project-aug-group
+    properties:
+      session.timeout.ms: 60000
+      auto.commit.interval.ms: 5000
+      max.poll.records: 5000
+      max.poll.records.enrichment: 50_000
+      max.poll.interval.ms: 60000
+      request.timeout.ms: 300000
+      num.stream.threads: 4
+      consumer.batch.size: 50000
+      max.partition.fetch.mb: 25
+      fetch.min.bytes: 10485760
+      fetch.max.wait.ms: 60000
+  producer:
+    properties:
+      max.block.ms: 5000
+
+logging:
+  level:
+    root: INFO
+    com.complexas: DEBUG

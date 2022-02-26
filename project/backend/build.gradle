@@ -1,0 +1,51 @@
+import org.eclipse.jgit.api.Git
+
+plugins {
+    id "com.github.ksoichiro.build.info" version "0.2.0"
+}
+
+//lombok {
+//    version = "${lombokVersion}"
+//    sha256 = ""
+//}
+
+
+ext {
+    artifactId = 'backend'
+}
+
+bootJar {
+    baseName = "${artifactId}"
+    version = "${artifactVersion}"
+    manifest {
+        attributes(
+                'Implementation-Version': project.version + '.' + getGitBranchCommit()
+        )
+    }
+}
+
+dependencies {
+    compile project(':api')
+    compile "org.springframework.boot:spring-boot-starter-web"
+    compile "org.springframework.kafka:spring-kafka"
+}
+
+
+def getGitBranchCommit() {
+    try {
+        def git = Git.open(project.file(project.getRootProject().getProjectDir()))
+        def repo = git.getRepository()
+        def id = repo.resolve(repo.getFullBranch())
+        return id.abbreviate(7).name()
+    } catch (IOException ex) {
+        return "UNKNOWN"
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}

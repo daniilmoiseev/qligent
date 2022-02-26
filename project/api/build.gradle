@@ -1,0 +1,25 @@
+jar {
+    enabled = true
+    baseName = 'api'
+}
+ext {
+    artifactId = 'api'
+    fasterxmlVersion = '2.13.0'
+}
+
+dependencies {
+    implementation "com.fasterxml.jackson.core:jackson-databind:${fasterxmlVersion}"
+}
+
+bootJar {
+    enabled = false
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+

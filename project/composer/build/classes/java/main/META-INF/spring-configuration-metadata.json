@@ -1,0 +1,32 @@
+{
+  "groups": [
+    {
+      "name": "kafka",
+      "type": "com.complexas.config.properties.KafkaProperties",
+      "sourceType": "com.complexas.config.properties.KafkaProperties"
+    },
+    {
+      "name": "kafka.producer",
+      "type": "com.complexas.config.properties.ProducerProperties",
+      "sourceType": "com.complexas.config.properties.ProducerProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "kafka.bootstrap-servers",
+      "type": "java.lang.String",
+      "sourceType": "com.complexas.config.properties.KafkaProperties"
+    },
+    {
+      "name": "kafka.enrich-raw-topic",
+      "type": "java.lang.String",
+      "sourceType": "com.complexas.config.properties.KafkaProperties"
+    },
+    {
+      "name": "kafka.producer.properties",
+      "type": "java.util.Properties",
+      "sourceType": "com.complexas.config.properties.ProducerProperties"
+    }
+  ],
+  "hints": []
+}

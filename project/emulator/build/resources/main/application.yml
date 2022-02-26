@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: emulator
+
+server:
+  port: 6060
+
+kafka:
+  bootstrap-servers: localhost:9092
+  parcel-raw-topic: parcel-raw
+  producer:
+    properties:
+      max.block.ms: 5000
+
+logging:
+  level:
+    root: INFO
+    com.complexas: DEBUG

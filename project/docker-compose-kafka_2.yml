@@ -1,0 +1,152 @@
+version: '2.1'
+
+services:
+  emulator:
+    build:
+      context: ./emulator
+      dockerfile: Dockerfile
+    ports:
+      - "6060:6060"
+    depends_on:
+      - kafka1
+      - kafka-topics-creator
+    links:
+      - kafka-topics-creator
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka1:19092
+
+  composer:
+    build:
+      context: ./composer
+      dockerfile: Dockerfile
+    ports:
+      - "7070:7070"
+    depends_on:
+      - kafka1
+      - db
+      - kafka-topics-creator
+    links:
+      - kafka-topics-creator
+    environment:
+      POSTGRES_HOST: db
+      KAFKA_BOOTSTRAP_SERVERS: kafka1:19092
+
+  augmentator:
+    build:
+      context: ./augmentator
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka1
+      - kafka-topics-creator
+    links:
+      - kafka-topics-creator
+    restart: on-failure
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka1:19092
+
+  clickhouse:
+    build:
+      context: ./clickhouse
+      dockerfile: Dockerfile
+    ports:
+      - "4040:4040"
+    depends_on:
+      - kafka1
+      - kafka-topics-creator
+    links:
+      - kafka-topics-creator
+    restart: on-failure
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka1:19092
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5050:5050"
+    depends_on:
+      - kafka1
+      - kafka-topics-creator
+    links:
+      - kafka-topics-creator
+    restart: on-failure
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka1:19092
+
+  server:
+    image: clickhouse/clickhouse-server
+    hostname: server
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+
+  client:
+    image: clickhouse/clickhouse-server
+    command: ['--host', 'server']
+
+  db:
+    image: postgres
+    hostname: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: composer
+    volumes:
+      - /var/lib/postgresql/data
+      - ./composer/src/main/resources/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  zoo1:
+    image: zookeeper:3.4.9
+    hostname: zoo1
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_PORT: 2181
+      ZOO_SERVERS: server.1=zoo1:2888:3888
+
+  kafka1:
+    image: confluentinc/cp-kafka:5.5.1
+    hostname: kafka1
+    ports:
+      - "9092:9092"
+      - "9999:9999"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
+    volumes:
+      - "./secret/:/etc/kafka/secrets"
+    depends_on:
+      - zoo1
+
+  kafka-topics-creator:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    hostname: kafka-topics-creator
+    depends_on:
+      - zoo1
+      - kafka1
+    restart: on-failure
+    environment:
+      ZOOKEEPER_HOSTS: "zoo1:2181"
+      KAFKA_TOPICS: "parcel-raw enrich-raw parcel-drop complete-out"

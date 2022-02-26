@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: composer
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: none
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://db/composer
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+server:
+  port: 7070
+
+kafka:
+  bootstrap-servers: localhost:9092
+  enrich-raw-topic: enrich-raw
+  producer:
+    properties:
+      max.block.ms: 5000
+
+logging:
+  level:
+    root: INFO
+    com.complexas: DEBUG

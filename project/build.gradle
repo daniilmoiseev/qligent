@@ -1,0 +1,61 @@
+buildscript {
+    ext {
+        artifactId = 'internat-project'
+        artifactGroup = 'com.complexas'
+        artifactVersion = '1.0-SNAPSHOT'
+        springBootVersion = '2.2.1.RELEASE'
+        lombokVersion = '1.18.4'
+        mapstructVersion = '1.3.0.Beta2'
+    }
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+//        classpath "io.franzbecker:gradle-lombok:3.1.0"
+    }
+}
+
+subprojects {
+    configurations {
+        compile.exclude module: 'spring-boot-starter-logging'
+        jaxb
+    }
+
+    apply plugin: 'java'
+    apply plugin: 'idea'
+//    apply plugin: 'io.franzbecker.gradle-lombok'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply from: "$rootDir/gradle/integTest.gradle"
+    apply plugin: 'maven-publish'
+    apply plugin: 'maven'
+
+    group = "${artifactGroup}"
+    version = "${artifactVersion}"
+    sourceCompatibility = '11'
+    
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    dependencies {
+
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+        compile 'io.springfox:springfox-boot-starter:3.0.0'
+        compile "org.aspectj:aspectjweaver"
+        compileOnly "org.mapstruct:mapstruct:${mapstructVersion}"
+        compile 'io.micrometer:micrometer-registry-jmx:latest.release'
+        compile "org.springframework.boot:spring-boot-starter-log4j2"
+        compile group: 'com.google.guava', name: 'guava', version: '28.2-jre'
+        compile 'org.apache.commons:commons-lang3:3.9'
+
+        annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    }
+
+}

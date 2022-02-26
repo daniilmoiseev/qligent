@@ -1,0 +1,42 @@
+{
+  "groups": [
+    {
+      "name": "kafka",
+      "type": "com.complexas.config.properties.KafkaProperties",
+      "sourceType": "com.complexas.config.properties.KafkaProperties"
+    },
+    {
+      "name": "kafka.consumer",
+      "type": "com.complexas.config.properties.ConsumerProperties",
+      "sourceType": "com.complexas.config.properties.ConsumerProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "kafka.bootstrap-servers",
+      "type": "java.lang.String",
+      "sourceType": "com.complexas.config.properties.KafkaProperties"
+    },
+    {
+      "name": "kafka.complete-out-topic",
+      "type": "java.lang.String",
+      "sourceType": "com.complexas.config.properties.KafkaProperties"
+    },
+    {
+      "name": "kafka.consumer.consumer-group",
+      "type": "java.lang.String",
+      "sourceType": "com.complexas.config.properties.ConsumerProperties"
+    },
+    {
+      "name": "kafka.consumer.properties",
+      "type": "java.util.Properties",
+      "sourceType": "com.complexas.config.properties.ConsumerProperties"
+    },
+    {
+      "name": "kafka.parcel-drop-topic",
+      "type": "java.lang.String",
+      "sourceType": "com.complexas.config.properties.KafkaProperties"
+    }
+  ],
+  "hints": []
+}

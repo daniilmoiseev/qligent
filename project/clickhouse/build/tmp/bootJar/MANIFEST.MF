@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Implementation-Version: 1.0-SNAPSHOT.UNKNOWN
+Main-Class: org.springframework.boot.loader.JarLauncher
+Start-Class: com.complexas.ClickhouseApplication
+Spring-Boot-Version: 2.2.1.RELEASE
+Spring-Boot-Classes: BOOT-INF/classes/
+Spring-Boot-Lib: BOOT-INF/lib/
+
